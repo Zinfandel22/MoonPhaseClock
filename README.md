@@ -12,38 +12,39 @@ Modified with Claude.ai to add Moon Rise/Set time
 - Current moon phase name + matching moon image, pulled from NASA's Dial-a-Moon API
 - Built with LVGL 8.3.11 UI designed in SquareLine Studio
 - Moon rise and Moon set time displayed
+- First-boot Wi-Fi, location, and time-zone setup through a local access point
 
 ## Hardware
 
-- ESP32 WROOM dev board
+- Seeed Studio XIAO ESP32C3
 - GC9A01 240×240 round SPI display
 
 ## Wiring
 
-| Display Pin | ESP32 GPIO |
-|---|---|
-| SDA | 17 |
-| SCL | 16 |
-| CS | 22 |
-| DC | 21 |
-| RST | 27 |
-| BL | Not used (always on) |
-| MISO | Not connected |
+| GC9A01 Pin | XIAO Pin | ESP32-C3 GPIO |
+|---|---|---|
+| SDA / MOSI | D4 | 6 |
+| SCL / SCK | D5 | 7 |
+| CS | D2 | 4 |
+| DC | D3 | 5 |
+| RST | D1 | 3 |
+| BL | Not connected (always on) | — |
+| MISO | Not connected | — |
 
 ## Setup Instructions
 
 1. **Open the project** in PlatformIO (VS Code extension).
-2. **Add your WiFi credentials.** Open `include/credentials.h` and fill in:
-   ```cpp
-   #define WIFI_SSID "your-wifi-name"
-   #define WIFI_PASSWORD "your-wifi-password"
-   ```
-3. **Update Lat/Long if not in Sydney** to your lat/long (use Google maps to find your lat/long)
-4. **Update TimeZone if not in NSW/ACT** update src/main.cpp line 37 to match your timezone
-5. **Add your email to src\main.cpp line 390** update "your-email@example.com" to your email address
-6. **Wire the display** to the ESP32 per the table above.
-7. **Build & upload** using PlatformIO (`esp32dev` environment is pre-configured for the GC9A01 driver).
-8. **Power on.** The moon animation plays for 3 seconds on boot, then the clock connects to WiFi, syncs time via NTP, and fetches the current moon phase.
+2. **Wire the display** to the XIAO ESP32C3 per the table above. `SDA` and `SCL` on the display are used as SPI MOSI and SCK, not as I²C signals.
+3. **Build and upload** using PlatformIO. The `esp32dev` environment targets the XIAO ESP32C3 and is configured for the GC9A01 display.
+4. **Open the Serial Monitor** at 115200 baud and reset the board. On first boot, the clock prints the setup access point name.
+5. **Connect a phone or computer** to that open access point; no password is needed. If the setup page does not open automatically, browse to `http://192.168.4.1`.
+6. **Enter the network and location settings.** Use decimal latitude and longitude. The time-zone field takes a POSIX TZ rule, for example `PST8PDT,M3.2.0,M11.1.0`. Leave the Wi-Fi password blank only for an open network; WPA passwords must be 8 to 63 characters.
+7. **Save and connect.** The clock saves settings in ESP32 nonvolatile storage, restarts, connects to Wi-Fi, syncs time via NTP, and fetches the current moon phase.
+8. **Set the MET Norway contact address** by replacing `your-email@example.com` in `src/main.cpp` before sharing or deploying the project.
+
+The setup access point starts when no settings have been saved or when the saved Wi-Fi network cannot be reached. If connection fails, the form retains the saved location and time zone; enter the Wi-Fi password again. Saved settings do not require editing `include/credentials.h`.
+
+The setup access point is open and does not encrypt traffic. Provision the clock only in a trusted location, then disconnect from the setup network after configuration.
 
 ## How It Works
 
@@ -56,4 +57,4 @@ Modified with Claude.ai to add Moon Rise/Set time
 ## Notes
 
 - If colors look swapped, toggle `TFT_RGB_ORDER` in `platformio.ini`.
-- If the display appears upside down, change `tft.setRotation(2)` in `main.cpp` to `0`.
+- If the display appears upside down, adjust the value passed to `tft.setRotation()` in `src/main.cpp`.
