@@ -13,6 +13,7 @@ Modified with Claude.ai to add Moon Rise/Set time
 - Built with LVGL 8.3.11 UI designed in SquareLine Studio
 - Moon rise and Moon set time displayed
 - First-boot Wi-Fi, location, and time-zone setup through a local access point
+- Moon images automatically rotate 180° for locations south of the equator
 
 ## Hardware
 
@@ -38,7 +39,7 @@ Modified with Claude.ai to add Moon Rise/Set time
 3. **Build and upload** using PlatformIO. The `esp32dev` environment targets the XIAO ESP32C3 and is configured for the GC9A01 display.
 4. **Open the Serial Monitor** at 115200 baud and reset the board. On first boot, the clock prints the setup access point name.
 5. **Connect a phone or computer** to that open access point; no password is needed. If the setup page does not open automatically, browse to `http://192.168.4.1`.
-6. **Enter the network and location settings.** Use decimal latitude and longitude. The time-zone field takes a POSIX TZ rule, for example `PST8PDT,M3.2.0,M11.1.0`. Leave the Wi-Fi password blank only for an open network; WPA passwords must be 8 to 63 characters.
+6. **Enter the network and location settings.** Use decimal latitude and longitude; a negative latitude automatically rotates the moon images 180° for the Southern Hemisphere. The time-zone field takes a POSIX TZ rule, for example `PST8PDT,M3.2.0,M11.1.0`. Leave the Wi-Fi password blank only for an open network; WPA passwords must be 8 to 63 characters.
 7. **Save and connect.** The clock saves settings in ESP32 nonvolatile storage, restarts, connects to Wi-Fi, syncs time via NTP, and fetches the current moon phase.
 8. **Set the MET Norway contact address** by replacing `your-email@example.com` in `src/main.cpp` before sharing or deploying the project.
 
